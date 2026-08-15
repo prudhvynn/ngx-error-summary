@@ -1,0 +1,84 @@
+name: Publish
+
+# Triggered by hand from the Actions tab. Publishing is irreversible — an npm
+# version can never be replaced — so this defaults to a dry run and you have to
+# deliberately untick it to release for real.
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (untick to actually publish)'
+        type: boolean
+        default: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    permissions:
+      # Required for npm trusted publishing (OIDC) and provenance. No NPM_TOKEN
+      # is stored anywhere; npm verifies this workflow's identity directly.
+      id-token: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+          cache: npm
+
+      # Trusted publishing needs npm 11.5.1 or newer; the runner ships older.
+      - name: Use an npm that supports trusted publishing
+        run: |
+          npm install -g npm@latest
+          npm --version
+
+      - run: npm ci
+
+      - name: Check formatting
+        run: npm run format:check
+
+      - name: Test
+        run: npm run test:ci
+
+      - name: Build the library
+        run: npm run build
+
+      - name: Read the version being published
+        id: meta
+        run: |
+          VERSION=$(node -p "require('./dist/ngx-error-summary/package.json').version")
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Version to publish: $VERSION"
+
+      # Fail early with a clear message rather than a raw 403 from the registry.
+      - name: Refuse to republish an existing version
+        run: |
+          VERSION="${{ steps.meta.outputs.version }}"
+          if npm view "ngx-error-summary@$VERSION" version >/dev/null 2>&1; then
+            echo "::error::ngx-error-summary@$VERSION is already on npm. Bump the version in projects/ngx-error-summary/package.json."
+            exit 1
+          fi
+          echo "$VERSION is unpublished — good to go."
+
+      - name: Publish (dry run)
+        if: ${{ inputs.dry_run }}
+        run: npm publish ./dist/ngx-error-summary --access public --dry-run
+
+      - name: Publish
+        if: ${{ !inputs.dry_run }}
+        run: npm publish ./dist/ngx-error-summary --access public
+
+      - name: Summary
+        run: |
+          VERSION="${{ steps.meta.outputs.version }}"
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            echo "### Dry run only — nothing was published" >> "$GITHUB_STEP_SUMMARY"
+            echo "Re-run with **Dry run** unticked to publish \`$VERSION\`." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "### Published ngx-error-summary@$VERSION" >> "$GITHUB_STEP_SUMMARY"
+            echo "https://www.npmjs.com/package/ngx-error-summary/v/$VERSION" >> "$GITHUB_STEP_SUMMARY"
+          fi
