@@ -55,7 +55,10 @@ jobs:
           echo "Version to publish: $VERSION"
 
       # Fail early with a clear message rather than a raw 403 from the registry.
+      # Only gates a real publish: a dry run should stay usable at any time for
+      # checking the pipeline, including when the current version is already out.
       - name: Refuse to republish an existing version
+        if: ${{ !inputs.dry_run }}
         run: |
           VERSION="${{ steps.meta.outputs.version }}"
           if npm view "ngx-error-summary@$VERSION" version >/dev/null 2>&1; then
@@ -63,6 +66,16 @@ jobs:
             exit 1
           fi
           echo "$VERSION is unpublished — good to go."
+
+      - name: Note whether this version is already published
+        if: ${{ inputs.dry_run }}
+        run: |
+          VERSION="${{ steps.meta.outputs.version }}"
+          if npm view "ngx-error-summary@$VERSION" version >/dev/null 2>&1; then
+            echo "::warning::$VERSION is already on npm. The dry run still exercises the pipeline, but a real publish would be rejected until the version is bumped."
+          else
+            echo "$VERSION is unpublished — a real run would publish it."
+          fi
 
       - name: Publish (dry run)
         if: ${{ inputs.dry_run }}
