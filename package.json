@@ -4,9 +4,14 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "ng build ngx-error-summary",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "test:ci": "ng test --watch=false",
+    "format": "prettier --write \"projects/**/*.{ts,html,json,md}\" \"*.{json,md}\"",
+    "format:check": "prettier --check \"projects/**/*.{ts,html,json,md}\" \"*.{json,md}\"",
+    "prepublishOnly": "echo \"Publish from dist/ngx-error-summary, not the workspace root\" && exit 1",
+    "release": "npm run format:check && npm run test:ci && npm run build && npm publish ./dist/ngx-error-summary --access public"
   },
   "private": true,
   "packageManager": "npm@11.12.1",

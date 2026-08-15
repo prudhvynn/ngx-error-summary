@@ -17,12 +17,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/USERNAME/ngx-error-summary.git"
+    "url": "git+https://github.com/prudhvynn/ngx-error-summary.git"
   },
   "bugs": {
-    "url": "https://github.com/USERNAME/ngx-error-summary/issues"
+    "url": "https://github.com/prudhvynn/ngx-error-summary/issues"
   },
-  "homepage": "https://github.com/USERNAME/ngx-error-summary#readme",
+  "homepage": "https://github.com/prudhvynn/ngx-error-summary#readme",
   "peerDependencies": {
     "@angular/common": ">=19.0.0",
     "@angular/core": ">=19.0.0",
@@ -31,5 +31,9 @@
   "dependencies": {
     "tslib": "^2.3.0"
   },
-  "sideEffects": false
+  "sideEffects": false,
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  }
 }
