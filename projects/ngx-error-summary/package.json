@@ -7,12 +7,22 @@
     "accessibility",
     "a11y",
     "wcag",
+    "aria",
+    "screen-reader",
     "forms",
+    "angular-forms",
     "reactive-forms",
+    "form-validation",
     "validation",
+    "validation-messages",
+    "form-errors",
+    "error-messages",
     "error-summary",
+    "focus-management",
     "signals",
-    "zoneless"
+    "angular-signals",
+    "zoneless",
+    "standalone"
   ],
   "license": "MIT",
   "repository": {

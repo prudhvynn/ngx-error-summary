@@ -1,14 +1,35 @@
 # ngx-error-summary
 
-Accessible validation error summary for Angular reactive forms.
+**Accessible validation error summary for Angular reactive forms.**
+
+[![npm](https://img.shields.io/npm/v/ngx-error-summary?color=cb3837&logo=npm)](https://www.npmjs.com/package/ngx-error-summary)
+[![downloads](https://img.shields.io/npm/dm/ngx-error-summary?color=cb3837)](https://www.npmjs.com/package/ngx-error-summary)
+[![CI](https://github.com/prudhvynn/ngx-error-summary/actions/workflows/ci.yml/badge.svg)](https://github.com/prudhvynn/ngx-error-summary/actions/workflows/ci.yml)
+[![Angular](https://img.shields.io/badge/Angular-%E2%89%A519-dd0031?logo=angular&logoColor=white)](https://angular.dev)
+[![license](https://img.shields.io/npm/l/ngx-error-summary?color=444)](./LICENSE)
 
 Signal-based, zoneless-safe, standalone. The summary block and the inline field
 messages resolve through **one** pipeline, so they can't drift out of sync — which
 is the failure mode that makes most hand-rolled validation displays inaccessible.
 
+**[Live demo →](https://prudhvynn.github.io/ngx-error-summary/)**
+
 ```bash
 npm install ngx-error-summary
 ```
+
+## What it does
+
+- **Summary on submit** that takes focus, so screen reader users are told the
+  submission failed instead of being left on the button.
+- **Each entry is a link** that moves focus to the offending field — including
+  fields nested in groups and `FormArray`s.
+- **Inline messages share the same pipeline**, so the wording in the summary and
+  beside the field can never disagree.
+- **Cross-field errors surface** against the group rather than vanishing.
+- **Themeable** through CSS custom properties, and the heading level is yours to
+  choose so the page outline stays intact.
+- **No dependencies** beyond Angular itself, ~14 kB packed, tree-shakeable.
 
 ## Why
 

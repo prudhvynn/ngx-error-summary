@@ -1,0 +1,58 @@
+name: Deploy demo
+
+# The demo doubles as the project's public page: a real, indexable URL that
+# shows the library working, rather than only a README describing it.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Never let two deploys race; drop queued ones rather than cancel a live deploy.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # The demo resolves `ngx-error-summary` through the workspace path
+      # mapping, so the library has to be built first.
+      - name: Build the library
+        run: npm run build
+
+      - name: Build the demo
+        run: npx ng build demo --base-href /ngx-error-summary/
+
+      # A 404 that serves the app keeps deep links working on Pages, which has
+      # no server-side rewrite.
+      - name: Add a SPA fallback
+        run: cp dist/demo/browser/index.html dist/demo/browser/404.html
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/demo/browser
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
