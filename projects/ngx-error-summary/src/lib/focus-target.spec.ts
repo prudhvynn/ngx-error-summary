@@ -39,6 +39,16 @@ describe('findFocusTarget', () => {
     expect(findFocusTarget(root, 'email')?.getAttribute('data-marker')).toBe('by-id');
   });
 
+  it('prefers a full-path data-nes-field match over a leaf formControlName match', () => {
+    // A repeated field name inside a nested group must resolve to the right one.
+    const root = host(`
+      <input formControlName="line1" data-marker="wrong-group" />
+      <div data-nes-field="address.line1" data-marker="right-group"></div>
+    `);
+
+    expect(findFocusTarget(root, 'address.line1')?.getAttribute('data-marker')).toBe('right-group');
+  });
+
   it('returns the first input of a radio group', () => {
     const root = host(`
       <fieldset>

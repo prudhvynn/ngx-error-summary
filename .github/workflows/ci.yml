@@ -35,3 +35,36 @@ jobs:
       - name: Verify the package is publishable
         working-directory: dist/ngx-error-summary
         run: npm pack --dry-run
+
+  # The peerDependencies range claims >=19. This is what makes that a tested
+  # claim rather than an assertion: each job builds a real app on that Angular
+  # major and AOT-compiles it against the packed tarball.
+  consumer-compat:
+    name: Angular ${{ matrix.angular }} consumer
+    runs-on: ubuntu-latest
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        angular: [19, 20, 21]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build and pack the library
+        run: |
+          npm run build
+          cd dist/ngx-error-summary
+          npm pack --pack-destination "$RUNNER_TEMP"
+
+      - name: Compile a consumer on Angular ${{ matrix.angular }}
+        run: |
+          TARBALL=$(ls "$RUNNER_TEMP"/ngx-error-summary-*.tgz | head -1)
+          bash scripts/check-consumer-compat.sh ${{ matrix.angular }} "$TARBALL"

@@ -5,8 +5,11 @@
  * long as one of these holds, and nothing has to be wired up per field.
  *
  *   1. an element whose `id` is the control path (`address.postalCode`)
- *   2. an element carrying `[formControlName]` for the leaf segment
- *   3. an element carrying `[data-nes-field]` for the full path
+ *   2. an element carrying `[data-nes-field]` for the full path
+ *   3. an element carrying `[formControlName]` for the leaf segment
+ *
+ * Full-path matches are tried before the leaf-name match, so a repeated field
+ * name inside a nested group resolves to the right one.
  *
  * Radio groups and checkbox groups resolve to their first input, which is the
  * correct focus target for a fieldset.
