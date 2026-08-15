@@ -1,0 +1,118 @@
+<main>
+  <header>
+    <h1>ngx-error-summary</h1>
+    <p class="lede">
+      Submit the form empty to see the summary appear and take focus. Every entry is a link that
+      moves focus to its field. The inline messages beside each field come from the same pipeline,
+      so their wording always matches the summary.
+    </p>
+  </header>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <!-- Focus lands here on submit; each entry links to the field below. -->
+    <nes-error-summary
+      [form]="form"
+      [show]="submitted()"
+      (navigated)="lastNavigation.set($event)"
+    />
+
+    <fieldset>
+      <legend>Your details</legend>
+
+      <div class="field">
+        <label for="fullName">Full name</label>
+        <input id="fullName" formControlName="fullName" autocomplete="name" />
+        <span class="error" nesErrorFor="fullName" nesLabel="Full name"></span>
+      </div>
+
+      <div class="field">
+        <label for="email">Email address</label>
+        <input id="email" type="email" formControlName="email" autocomplete="email" />
+        <span class="error" nesErrorFor="email" nesLabel="Email address"></span>
+      </div>
+
+      <div class="field">
+        <label for="sku">Product code</label>
+        <input id="sku" formControlName="sku" placeholder="AB-1234" />
+        <span class="hint">Two letters, a hyphen, then four digits.</span>
+        <span class="error" nesErrorFor="sku" nesLabel="Product code"></span>
+      </div>
+    </fieldset>
+
+    <!-- Nested group: paths resolve as address.line1, address.postalCode -->
+    <fieldset formGroupName="address">
+      <legend>Address</legend>
+
+      <div class="field">
+        <label for="address.line1">Address line 1</label>
+        <input id="address.line1" formControlName="line1" />
+        <span class="error" nesErrorFor="line1" nesLabel="Address line 1"></span>
+      </div>
+
+      <div class="field">
+        <label for="address.postalCode">Postal code</label>
+        <input id="address.postalCode" formControlName="postalCode" />
+        <span class="error" nesErrorFor="postalCode" nesLabel="Postal code"></span>
+      </div>
+    </fieldset>
+
+    <!--
+      Cross-field validator. The error belongs to the group, not either input, so
+      the summary reports it against `dates` and focuses the fieldset itself via
+      data-nes-field.
+    -->
+    <fieldset formGroupName="dates" data-nes-field="dates">
+      <legend>Dates</legend>
+
+      <div class="field">
+        <label for="dates.startDate">Start date</label>
+        <input id="dates.startDate" type="date" formControlName="startDate" />
+        <span class="error" nesErrorFor="startDate" nesLabel="Start date"></span>
+      </div>
+
+      <div class="field">
+        <label for="dates.endDate">End date</label>
+        <input id="dates.endDate" type="date" formControlName="endDate" />
+        <span class="error" nesErrorFor="endDate" nesLabel="End date"></span>
+      </div>
+    </fieldset>
+
+    <!-- FormArray: paths resolve as attendees.0.name, attendees.1.name, ... -->
+    <fieldset formArrayName="attendees">
+      <legend>Attendees</legend>
+
+      @for (row of attendees.controls; track $index) {
+        <div class="field row" [formGroupName]="$index">
+          <div class="grow">
+            <label [attr.for]="'attendees.' + $index + '.name'"> Attendee {{ $index + 1 }} </label>
+            <input [id]="'attendees.' + $index + '.name'" formControlName="name" />
+            <span class="error" nesErrorFor="name" [nesLabel]="'Attendee ' + ($index + 1)"> </span>
+          </div>
+          @if (attendees.length > 1) {
+            <button type="button" class="ghost" (click)="removeAttendee($index)">Remove</button>
+          }
+        </div>
+      }
+
+      <button type="button" class="ghost" (click)="addAttendee()">Add attendee</button>
+    </fieldset>
+
+    <div class="actions">
+      <button type="submit">Submit</button>
+      <button type="button" class="ghost" (click)="reset()">Reset</button>
+    </div>
+  </form>
+
+  @if (lastNavigation(); as nav) {
+    <p class="status">
+      Summary link activated → focus moved to <code>{{ nav.path }}</code> ({{ nav.key }})
+    </p>
+  }
+
+  @if (submittedValue(); as value) {
+    <section class="success">
+      <h2>Submitted</h2>
+      <pre>{{ value | json }}</pre>
+    </section>
+  }
+</main>

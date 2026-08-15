@@ -21,13 +21,16 @@ jobs:
       - run: npm ci
 
       - name: Check formatting
-        run: npx prettier --check "projects/**/*.{ts,html,json,md}"
+        run: npm run format:check
 
       - name: Test
-        run: npx ng test --watch=false
+        run: npm run test:ci
 
-      - name: Build
-        run: npx ng build ngx-error-summary
+      - name: Build the library
+        run: npm run build
+
+      - name: Build the demo
+        run: npx ng build demo
 
       - name: Verify the package is publishable
         working-directory: dist/ngx-error-summary
