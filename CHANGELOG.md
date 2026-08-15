@@ -5,6 +5,21 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2026-08-14
+
+No library code changed in this release. npm renders a package's README and
+keywords from the published tarball, so the discoverability work landed in
+0.2.0's repository but never reached the npm page; this publishes it.
+
+### Changed
+
+- README now leads with badges, a link to the live demo, and a short summary of
+  what the library does, so the npm page answers "what is this and does it
+  work" without scrolling.
+- npm keywords broadened from ten to twenty, covering the terms people actually
+  search for — `form-validation`, `angular-forms`, `screen-reader`, `aria`,
+  `focus-management`, `validation-messages`.
+
 ## [0.2.0] - 2026-08-14
 
 ### Added

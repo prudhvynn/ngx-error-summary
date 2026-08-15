@@ -1,6 +1,6 @@
 {
   "name": "ngx-error-summary",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Accessible validation error summary for Angular reactive forms. Signal-based, zoneless, standalone — one message pipeline shared by the summary block and inline field errors.",
   "keywords": [
     "angular",
