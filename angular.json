@@ -1,0 +1,36 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "cli": {
+    "packageManager": "npm"
+  },
+  "newProjectRoot": "projects",
+  "projects": {
+    "ngx-error-summary": {
+      "projectType": "library",
+      "root": "projects/ngx-error-summary",
+      "sourceRoot": "projects/ngx-error-summary/src",
+      "prefix": "nes",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:ng-packagr",
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/ngx-error-summary/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/ngx-error-summary/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular/build:unit-test",
+          "options": {
+            "tsConfig": "projects/ngx-error-summary/tsconfig.spec.json"
+          }
+        }
+      }
+    }
+  }
+}

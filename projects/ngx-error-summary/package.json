@@ -1,0 +1,35 @@
+{
+  "name": "ngx-error-summary",
+  "version": "0.1.0",
+  "description": "Accessible validation error summary for Angular reactive forms. Signal-based, zoneless, standalone — one message pipeline shared by the summary block and inline field errors.",
+  "keywords": [
+    "angular",
+    "accessibility",
+    "a11y",
+    "wcag",
+    "forms",
+    "reactive-forms",
+    "validation",
+    "error-summary",
+    "signals",
+    "zoneless"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/USERNAME/ngx-error-summary.git"
+  },
+  "bugs": {
+    "url": "https://github.com/USERNAME/ngx-error-summary/issues"
+  },
+  "homepage": "https://github.com/USERNAME/ngx-error-summary#readme",
+  "peerDependencies": {
+    "@angular/common": ">=19.0.0",
+    "@angular/core": ">=19.0.0",
+    "@angular/forms": ">=19.0.0"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "sideEffects": false
+}
