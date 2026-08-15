@@ -12,7 +12,7 @@ npm install ngx-error-summary
 
 ## Why
 
-Angular ships validators but no story for *presenting* failures accessibly. Teams
+Angular ships validators but no story for _presenting_ failures accessibly. Teams
 end up hand-writing a summary block, hand-writing inline messages, and letting the
 two disagree. Screen reader users then get a summary that says one thing and a
 field that says another — or no announcement at all, because focus never moved.
@@ -75,14 +75,14 @@ convention-based, so nothing needs registering — the first match wins:
 
 ## API
 
-| Export | Purpose |
-| --- | --- |
-| `<nes-error-summary [form] [show] [heading] [includeUntouched] (navigated)>` | The summary block |
-| `[nesErrorFor]` + `[nesLabel]` `[nesEager]` | Inline message for one control |
-| `provideErrorSummary(config)` | App-wide messages, resolvers, heading |
-| `collectErrors(control, config, opts)` | The walker, if you want to render your own UI |
-| `FieldError` | `{ path, key, message, error }` — the shared protocol |
-| `ErrorMessageResolver` | `(ctx) => string \| null`, chained before the message map |
+| Export                                                                       | Purpose                                                   |
+| ---------------------------------------------------------------------------- | --------------------------------------------------------- |
+| `<nes-error-summary [form] [show] [heading] [includeUntouched] (navigated)>` | The summary block                                         |
+| `[nesErrorFor]` + `[nesLabel]` `[nesEager]`                                  | Inline message for one control                            |
+| `provideErrorSummary(config)`                                                | App-wide messages, resolvers, heading                     |
+| `collectErrors(control, config, opts)`                                       | The walker, if you want to render your own UI             |
+| `FieldError`                                                                 | `{ path, key, message, error }` — the shared protocol     |
+| `ErrorMessageResolver`                                                       | `(ctx) => string \| null`, chained before the message map |
 
 Nested groups and `FormArray`s are walked depth-first in declaration order, so the
 summary lists problems in the order they appear on screen. Group-level

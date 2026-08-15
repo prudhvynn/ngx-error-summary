@@ -12,11 +12,18 @@ export function setControlLabel(control: AbstractControl, label: string): void {
 
 /** `address.postalCode` -> `Postal code`; `items.0.title` -> `Title`. */
 export function humanisePath(path: string): string {
-  const leaf = path.split('.').filter(part => !/^\d+$/.test(part)).pop() ?? path;
+  const leaf =
+    path
+      .split('.')
+      .filter((part) => !/^\d+$/.test(part))
+      .pop() ?? path;
   const spaced = leaf
     .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
     .replace(/[_-]+/g, ' ')
-    .trim();
+    .trim()
+    // Sentence case, not title case: the label is interpolated mid-sentence by
+    // messages like `${label} must be 8 characters or more`.
+    .toLowerCase();
   return spaced.charAt(0).toUpperCase() + spaced.slice(1);
 }
 

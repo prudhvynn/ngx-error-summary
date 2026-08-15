@@ -36,13 +36,7 @@ import { FieldError } from './models';
   host: { '[attr.data-empty]': 'errors().length === 0 ? "" : null' },
   template: `
     @if (show() && errors().length) {
-      <div
-        #box
-        class="nes-summary"
-        role="alert"
-        tabindex="-1"
-        [attr.aria-labelledby]="headingId"
-      >
+      <div #box class="nes-summary" role="alert" tabindex="-1" [attr.aria-labelledby]="headingId">
         <h2 class="nes-summary__heading" [id]="headingId">{{ heading() }}</h2>
         <ul class="nes-summary__list">
           @for (error of errors(); track error.path + error.key) {
@@ -113,8 +107,8 @@ export class ErrorSummaryComponent {
 
   constructor() {
     // Reactive forms are not signal-based, so bridge their event stream.
-    effect(onCleanup => {
-      const sub = this.form().events.subscribe(() => this.revision.update(r => r + 1));
+    effect((onCleanup) => {
+      const sub = this.form().events.subscribe(() => this.revision.update((r) => r + 1));
       onCleanup(() => sub.unsubscribe());
     });
 

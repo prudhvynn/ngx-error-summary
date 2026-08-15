@@ -20,9 +20,7 @@ export function findFocusTarget(host: ParentNode, path: string): HTMLElement | n
   const byData = host.querySelector<HTMLElement>(`[data-nes-field="${cssEscape(path)}"]`);
   if (byData) return byData;
 
-  const byControlName = host.querySelector<HTMLElement>(
-    `[formControlName="${cssEscape(leaf)}"]`,
-  );
+  const byControlName = host.querySelector<HTMLElement>(`[formControlName="${cssEscape(leaf)}"]`);
   if (byControlName) return byControlName;
 
   return null;
@@ -34,7 +32,9 @@ export function focusElement(el: HTMLElement): void {
     el.setAttribute('tabindex', '-1');
   }
   el.focus({ preventScroll: true });
-  el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  // Not implemented in jsdom, so guard it — otherwise every consumer's unit test
+  // that submits an invalid form crashes here rather than in their own code.
+  el.scrollIntoView?.({ block: 'center', behavior: 'smooth' });
 }
 
 function isNativelyFocusable(el: HTMLElement): boolean {

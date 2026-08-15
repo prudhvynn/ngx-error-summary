@@ -38,7 +38,4 @@ export interface ErrorMessageContext {
 export type ErrorMessageResolver = (ctx: ErrorMessageContext) => string | null;
 
 /** Map of validator key to message or message factory. */
-export type ErrorMessageMap = Record<
-  string,
-  string | ((ctx: ErrorMessageContext) => string)
->;
+export type ErrorMessageMap = Record<string, string | ((ctx: ErrorMessageContext) => string)>;

@@ -1,11 +1,4 @@
-import {
-  Directive,
-  computed,
-  effect,
-  inject,
-  input,
-  signal,
-} from '@angular/core';
+import { Directive, computed, effect, inject, input, signal } from '@angular/core';
 import { ControlContainer } from '@angular/forms';
 import { collectErrors, setControlLabel } from './collect-errors';
 import { ERROR_SUMMARY_CONFIG, resolveErrorSummaryConfig } from './messages';
@@ -64,10 +57,10 @@ export class ErrorForDirective {
   });
 
   constructor() {
-    effect(onCleanup => {
+    effect((onCleanup) => {
       const root = this.container?.control;
       if (!root) return;
-      const sub = root.events.subscribe(() => this.revision.update(r => r + 1));
+      const sub = root.events.subscribe(() => this.revision.update((r) => r + 1));
       onCleanup(() => sub.unsubscribe());
     });
 
