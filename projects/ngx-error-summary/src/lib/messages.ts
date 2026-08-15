@@ -1,5 +1,5 @@
 import { InjectionToken, Provider } from '@angular/core';
-import { ErrorMessageContext, ErrorMessageMap, ErrorMessageResolver } from './models';
+import { ErrorMessageContext, ErrorMessageMap, ErrorMessageResolver, HeadingLevel } from './models';
 
 /** Messages for Angular's built-in validators. Override any of them via `provideErrorSummary`. */
 export const DEFAULT_ERROR_MESSAGES: ErrorMessageMap = {
@@ -22,6 +22,11 @@ export interface ErrorSummaryConfig {
   readonly resolvers?: readonly ErrorMessageResolver[];
   /** Heading rendered above the summary list. */
   readonly heading?: string;
+  /**
+   * Heading level for that heading. Set it to whatever keeps the host page's
+   * outline intact; defaults to 2. Overridable per instance.
+   */
+  readonly headingLevel?: HeadingLevel;
 }
 
 export const ERROR_SUMMARY_CONFIG = new InjectionToken<Required<ErrorSummaryConfig>>(
@@ -36,6 +41,7 @@ export function resolveErrorSummaryConfig(
     messages: { ...DEFAULT_ERROR_MESSAGES, ...(config.messages ?? {}) },
     resolvers: config.resolvers ?? [],
     heading: config.heading ?? 'There is a problem',
+    headingLevel: config.headingLevel ?? 2,
   };
 }
 

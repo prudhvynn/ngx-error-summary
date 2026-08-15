@@ -14,7 +14,7 @@ import { AbstractControl } from '@angular/forms';
 import { collectErrors } from './collect-errors';
 import { findFocusTarget, focusElement } from './focus-target';
 import { ERROR_SUMMARY_CONFIG, resolveErrorSummaryConfig } from './messages';
-import { FieldError } from './models';
+import { FieldError, HeadingLevel } from './models';
 
 /**
  * Accessible validation summary for reactive forms.
@@ -37,7 +37,31 @@ import { FieldError } from './models';
   template: `
     @if (show() && errors().length) {
       <div #box class="nes-summary" role="alert" tabindex="-1" [attr.aria-labelledby]="headingId">
-        <h2 class="nes-summary__heading" [id]="headingId">{{ heading() }}</h2>
+        <!--
+          A real heading element per level, rather than one div with
+          role="heading" + aria-level. Native semantics are better supported by
+          assistive tech, and this library exists to get exactly that right.
+        -->
+        @switch (headingLevel()) {
+          @case (1) {
+            <h1 class="nes-summary__heading" [id]="headingId">{{ heading() }}</h1>
+          }
+          @case (3) {
+            <h3 class="nes-summary__heading" [id]="headingId">{{ heading() }}</h3>
+          }
+          @case (4) {
+            <h4 class="nes-summary__heading" [id]="headingId">{{ heading() }}</h4>
+          }
+          @case (5) {
+            <h5 class="nes-summary__heading" [id]="headingId">{{ heading() }}</h5>
+          }
+          @case (6) {
+            <h6 class="nes-summary__heading" [id]="headingId">{{ heading() }}</h6>
+          }
+          @default {
+            <h2 class="nes-summary__heading" [id]="headingId">{{ heading() }}</h2>
+          }
+        }
         <ul class="nes-summary__list">
           @for (error of errors(); track error.path + error.key) {
             <li>
@@ -53,23 +77,41 @@ import { FieldError } from './models';
       </div>
     }
   `,
+  /*
+   * Every value is a custom property with the previous hard-coded value as its
+   * fallback, so the defaults are unchanged but all of it is now overridable.
+   *
+   * Custom properties rather than plain classes because this component uses
+   * emulated encapsulation: Angular rewrites `.nes-summary` to
+   * `.nes-summary[_ngcontent-xyz]`, which outranks a consumer's `.nes-summary`
+   * rule. Custom properties inherit through that and need no ::ng-deep.
+   */
   styles: `
     .nes-summary {
-      border: 4px solid currentColor;
-      padding: 1rem;
-      margin-block-end: 1.5rem;
+      color: var(--nes-summary-color, inherit);
+      background: var(--nes-summary-background, transparent);
+      border: var(--nes-summary-border-width, 4px) solid
+        var(--nes-summary-border-color, currentColor);
+      border-radius: var(--nes-summary-border-radius, 0);
+      padding: var(--nes-summary-padding, 1rem);
+      margin-block-end: var(--nes-summary-gap, 1.5rem);
     }
     .nes-summary:focus-visible {
-      outline: 3px solid;
-      outline-offset: 2px;
+      outline: var(--nes-summary-focus-width, 3px) solid
+        var(--nes-summary-focus-color, currentColor);
+      outline-offset: var(--nes-summary-focus-offset, 2px);
     }
     .nes-summary__heading {
       margin: 0 0 0.5rem;
-      font-size: 1.125rem;
+      font-size: var(--nes-summary-heading-size, 1.125rem);
+      color: var(--nes-summary-heading-color, inherit);
     }
     .nes-summary__list {
       margin: 0;
-      padding-inline-start: 1.25rem;
+      padding-inline-start: var(--nes-summary-list-indent, 1.25rem);
+    }
+    .nes-summary__link {
+      color: var(--nes-summary-link-color, inherit);
     }
   `,
 })
@@ -86,6 +128,13 @@ export class ErrorSummaryComponent {
 
   /** Overrides the app-wide heading. */
   readonly heading = input(this.config.heading);
+
+  /**
+   * Heading level for the summary's heading. Pick whatever keeps the enclosing
+   * page's outline intact — a summary inside a section introduced by an `h2`
+   * belongs at `h3`. Defaults to the app-wide setting, itself `2`.
+   */
+  readonly headingLevel = input<HeadingLevel>(this.config.headingLevel);
 
   /** Report errors on untouched controls too — correct after a submit attempt. */
   readonly includeUntouched = input(true);

@@ -73,16 +73,83 @@ convention-based, so nothing needs registering — the first match wins:
 2. `[data-nes-field]` equal to the control path
 3. `[formControlName]` equal to the leaf segment
 
+## Styling
+
+Every painted value is a CSS custom property, so you restyle the summary from
+anywhere in your app — no `::ng-deep`, no `!important`, no specificity fight:
+
+```css
+:root {
+  --nes-summary-color: #b00020;
+  --nes-summary-border-color: #b00020;
+  --nes-summary-background: #fff5f5;
+  --nes-summary-padding: 1.5rem;
+}
+```
+
+Scope them like any other custom property — set them on `:root` for the whole
+app, or on a wrapper to restyle one form.
+
+| Custom property               | Default        | Applies to                     |
+| ----------------------------- | -------------- | ------------------------------ |
+| `--nes-summary-color`         | `inherit`      | Text colour of the whole block |
+| `--nes-summary-background`    | `transparent`  | Block background               |
+| `--nes-summary-border-width`  | `4px`          | Border thickness               |
+| `--nes-summary-border-color`  | `currentColor` | Border colour                  |
+| `--nes-summary-border-radius` | `0`            | Corner radius                  |
+| `--nes-summary-padding`       | `1rem`         | Inner padding                  |
+| `--nes-summary-gap`           | `1.5rem`       | Space below the block          |
+| `--nes-summary-heading-size`  | `1.125rem`     | Heading font size              |
+| `--nes-summary-heading-color` | `inherit`      | Heading colour                 |
+| `--nes-summary-list-indent`   | `1.25rem`      | List indentation               |
+| `--nes-summary-link-color`    | `inherit`      | Entry link colour              |
+| `--nes-summary-focus-width`   | `3px`          | Focus ring thickness           |
+| `--nes-summary-focus-color`   | `currentColor` | Focus ring colour              |
+| `--nes-summary-focus-offset`  | `2px`          | Focus ring offset              |
+
+Custom properties are used rather than plain class overrides because the
+component uses emulated encapsulation: Angular rewrites `.nes-summary` to
+`.nes-summary[_ngcontent-xyz]`, which outranks a consumer's own `.nes-summary`
+rule. Custom properties inherit straight through that.
+
+If you'd rather restyle from scratch, the markup carries stable class names —
+`.nes-summary`, `.nes-summary__heading`, `.nes-summary__list`,
+`.nes-summary__link` — and the host element gets `[data-empty]` when there is
+nothing to report.
+
+## Heading level
+
+The summary renders a real heading element. Which level is right depends on the
+page, not on the library — a summary inside a section already introduced by an
+`h2` belongs at `h3`, or it breaks the document outline that screen reader users
+navigate by.
+
+```html
+<nes-error-summary [form]="form" [show]="submitted()" [headingLevel]="3" />
+```
+
+Set the app-wide default through the provider, and override it per instance
+where a page needs something different:
+
+```ts
+provideErrorSummary({ headingLevel: 3 });
+```
+
+Levels 1–6 render `<h1>`–`<h6>`; the default is `2`. Real heading elements are
+used rather than `role="heading"` with `aria-level`, because native semantics
+have better assistive-technology support.
+
 ## API
 
-| Export                                                                       | Purpose                                                   |
-| ---------------------------------------------------------------------------- | --------------------------------------------------------- |
-| `<nes-error-summary [form] [show] [heading] [includeUntouched] (navigated)>` | The summary block                                         |
-| `[nesErrorFor]` + `[nesLabel]` `[nesEager]`                                  | Inline message for one control                            |
-| `provideErrorSummary(config)`                                                | App-wide messages, resolvers, heading                     |
-| `collectErrors(control, config, opts)`                                       | The walker, if you want to render your own UI             |
-| `FieldError`                                                                 | `{ path, key, message, error }` — the shared protocol     |
-| `ErrorMessageResolver`                                                       | `(ctx) => string \| null`, chained before the message map |
+| Export                                                                                      | Purpose                                                   |
+| ------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| `<nes-error-summary [form] [show] [heading] [headingLevel] [includeUntouched] (navigated)>` | The summary block                                         |
+| `[nesErrorFor]` + `[nesLabel]` `[nesEager]`                                                 | Inline message for one control                            |
+| `provideErrorSummary(config)`                                                               | App-wide messages, resolvers, heading, heading level      |
+| `collectErrors(control, config, opts)`                                                      | The walker, if you want to render your own UI             |
+| `FieldError`                                                                                | `{ path, key, message, error }` — the shared protocol     |
+| `ErrorMessageResolver`                                                                      | `(ctx) => string \| null`, chained before the message map |
+| `HeadingLevel`                                                                              | `1 \| 2 \| 3 \| 4 \| 5 \| 6`                              |
 
 Nested groups and `FormArray`s are walked depth-first in declaration order, so the
 summary lists problems in the order they appear on screen. Group-level

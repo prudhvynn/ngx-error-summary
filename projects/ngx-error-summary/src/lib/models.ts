@@ -18,6 +18,15 @@ export interface FieldError {
   readonly error: unknown;
 }
 
+/**
+ * Heading level for the summary block.
+ *
+ * The right level depends on the page the summary sits in, not on the library:
+ * a summary inside a section already introduced by an `h2` belongs at `h3`, or
+ * it breaks the document outline that screen reader users navigate by.
+ */
+export type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
+
 /** Context handed to a message resolver for a single failed validator. */
 export interface ErrorMessageContext {
   readonly path: string;

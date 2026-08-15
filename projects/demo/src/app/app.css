@@ -5,6 +5,17 @@
   --line: #b1b4b6;
   --bad: #d4351c;
   --good: #00703c;
+
+  /*
+   * Restyling the summary from outside the library. No ::ng-deep and no
+   * !important — custom properties inherit through Angular's emulated
+   * encapsulation, which plain class overrides cannot.
+   */
+  --nes-summary-color: var(--bad);
+  --nes-summary-background: #fef7f7;
+  --nes-summary-border-color: var(--bad);
+  --nes-summary-padding: 1.25rem;
+  --nes-summary-heading-size: 1.25rem;
 }
 
 main {
