@@ -19,10 +19,15 @@ jobs:
       # Required for npm trusted publishing (OIDC) and provenance. No NPM_TOKEN
       # is stored anywhere; npm verifies this workflow's identity directly.
       id-token: write
-      contents: read
+      # Needed to push the version tag and create the GitHub release. Only used
+      # after a successful real publish.
+      contents: write
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Tags are needed to tell an already-tagged version from a new one.
+          fetch-depth: 0
 
       - uses: actions/setup-node@v4
         with:
@@ -84,6 +89,46 @@ jobs:
       - name: Publish
         if: ${{ !inputs.dry_run }}
         run: npm publish ./dist/ngx-error-summary --access public
+
+      # Only after the publish has actually succeeded: a tag pointing at a
+      # version that never made it to npm is worse than no tag.
+      - name: Tag the release
+        if: ${{ !inputs.dry_run }}
+        run: |
+          VERSION="${{ steps.meta.outputs.version }}"
+          TAG="v$VERSION"
+          if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
+            echo "$TAG already exists — leaving it alone."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "$TAG" -m "$VERSION"
+          git push origin "$TAG"
+          echo "Tagged $TAG"
+
+      - name: Create the GitHub release
+        if: ${{ !inputs.dry_run }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION="${{ steps.meta.outputs.version }}"
+          TAG="v$VERSION"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG already exists — leaving it alone."
+            exit 0
+          fi
+          # Lift this version's section out of the changelog for the notes.
+          awk -v v="^## \\[$VERSION\\]" '$0 ~ v {flag=1; next} /^## \[/{flag=0} flag' \
+            CHANGELOG.md > /tmp/notes.md
+          if [ ! -s /tmp/notes.md ]; then
+            echo "No CHANGELOG section for $VERSION; falling back to a bare note."
+            echo "See CHANGELOG.md." > /tmp/notes.md
+          fi
+          echo "" >> /tmp/notes.md
+          echo "https://www.npmjs.com/package/ngx-error-summary/v/$VERSION" >> /tmp/notes.md
+          gh release create "$TAG" --title "$VERSION" --notes-file /tmp/notes.md
+          echo "Created release $TAG"
 
       - name: Summary
         run: |
